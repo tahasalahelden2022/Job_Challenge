@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
       BottomDrawerController();
   late VideoPlayerController player_controller;
   late Future<void> _initializeVideoPlayerFuture;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -74,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
 // VideoPlayerController to finish initializing.
   String _selectedItem = 'New';
 
-  List<String> _dropdownItems = [
+  final List<String> _dropdownItems = [
     'New',
     'Old',
     'vote',
@@ -190,6 +191,25 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   ];
 
+  countcomments() {
+    int count = 0;
+    int child = 0;
+    for (var comment in comments) {
+      int c = comment["child"].length;
+      child += c;
+    }
+    count = child + comments.length;
+    return count;
+  }
+
+  _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,9 +252,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Row(
                   children: [
-                    Container(
-                        child: DropdownButton<String>(
-                      style: TextStyle(color: Colors.white),
+                    DropdownButton<String>(
+                      style: const TextStyle(color: Colors.white),
                       dropdownColor: Colors.black,
                       value: _selectedItem,
                       onChanged: (newValue) {
@@ -248,13 +267,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text(item),
                         );
                       }).toList(),
-                    ))
+                    )
                   ],
                 )
               ]),
             ),
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                 itemCount: comments.length,
                 itemBuilder: (BuildContext context, int index) {
                   return comment(index);
@@ -280,7 +300,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 100,
                           height: 20,
                           decoration: const BoxDecoration(
-                              color: const Color.fromRGBO(41, 41, 41, 0.867),
+                              color: Color.fromRGBO(41, 41, 41, 0.867),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(12.0))),
                         ),
@@ -412,6 +432,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.white,
                             ),
                           ),
+                          Text("${countcomments()}"),
                           const SizedBox(
                             height: 10,
                           ),
@@ -691,6 +712,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Icons.more_horiz,
                           color: Colors.white,
                         )),
+                    const Text("0"),
                     TextButton(
                         onPressed: () {},
                         child: const Icon(
@@ -740,6 +762,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
                 comment_controller.clear();
                 setState(() {});
+                _scrollToBottom();
               },
               child: const Icon(Icons.send))
         ],
@@ -747,7 +770,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  commentBoxReplay(index) {
+  commentBoxReplay(int index) {
     return Container(
       height: 50,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),

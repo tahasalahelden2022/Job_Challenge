@@ -48,32 +48,25 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController commentChild_controller = TextEditingController();
   final BottomDrawerController bottomDrawer_controller =
       BottomDrawerController();
-  late VideoPlayerController _controller;
+  late VideoPlayerController player_controller;
   late Future<void> _initializeVideoPlayerFuture;
 
   @override
   void initState() {
     super.initState();
-
-    // Create and store the VideoPlayerController. The VideoPlayerController
-    // offers several different constructors to play videos from assets, files,
-    // or the internet.
-    _controller = VideoPlayerController.networkUrl(
+    player_controller = VideoPlayerController.networkUrl(
       Uri.parse(
         'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
       ),
     );
-
-    _initializeVideoPlayerFuture = _controller.initialize();
+    _initializeVideoPlayerFuture = player_controller.initialize();
     setState(() {});
-    _controller.play();
+    player_controller.play();
   }
 
   @override
   void dispose() {
-    // Ensure disposing of the VideoPlayerController to free up resources.
-    _controller.dispose();
-
+    player_controller.dispose();
     super.dispose();
   }
 
@@ -316,27 +309,27 @@ class _MyHomePageState extends State<MyHomePage> {
                             // If the VideoPlayerController has finished initialization, use
                             // the data it provides to limit the aspect ratio of the video.
                             return AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
+                              aspectRatio: player_controller.value.aspectRatio,
                               // Use the VideoPlayer widget to display the video.
                               child: Stack(
                                 alignment: Alignment.bottomCenter,
                                 children: <Widget>[
-                                  VideoPlayer(_controller),
+                                  VideoPlayer(player_controller),
                                   const ClosedCaption(text: null),
                                   // Here you can also add Overlay capacities
                                   TextButton(
                                     onPressed: () {
-                                      if (_controller.value.isPlaying) {
-                                        _controller.pause();
+                                      if (player_controller.value.isPlaying) {
+                                        player_controller.pause();
                                       } else {
                                         // If the video is paused, play it.
-                                        _controller.play();
+                                        player_controller.play();
                                       }
 
                                       setState(() {});
                                     },
                                     child: Icon(
-                                      _controller.value.isPlaying
+                                      player_controller.value.isPlaying
                                           ? Icons.pause
                                           : Icons.play_arrow,
                                       size: 25,
@@ -345,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                   ),
                                   VideoProgressIndicator(
-                                    _controller,
+                                    player_controller,
                                     allowScrubbing: true,
                                     padding: const EdgeInsets.all(3),
                                     colors: const VideoProgressColors(
@@ -357,8 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             );
                           } else {
-                            // If the VideoPlayerController is still initializing, show a
-                            // loading spinner.
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
